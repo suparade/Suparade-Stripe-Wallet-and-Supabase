@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.auth import require_agent
 from app.db import get_supabase
-from app.schemas import DetectionIn, TipIn, VideoIn, VideoStatusIn
+from app.schemas import DetectionIn, StreamEventIn, TipIn, VideoIn, VideoStatusIn
+from app.services.stream_events import StreamEventError, handle_stream_event
 from app.services.tips import TipError, reserve_tip, settle_tip
 
 # Everything the finder agent and the tipper agent call lives here. Auth: X-Agent-Key header.
@@ -119,3 +120,15 @@ def create_tip(body: TipIn):
     except TipError as e:
         raise HTTPException(e.status_code, e.code)
     return settle_tip(tip)
+
+
+@router.post("/stream-events")
+def stream_event(body: StreamEventIn):
+    """The Gemini livestream detector reports a verified moment; we log it and pay the streamer.
+
+    Idempotent on event_id: sending the same event again returns the same detection and tip.
+    """
+    try:
+        return handle_stream_event(body)
+    except StreamEventError as e:
+        raise HTTPException(e.status_code, e.code)

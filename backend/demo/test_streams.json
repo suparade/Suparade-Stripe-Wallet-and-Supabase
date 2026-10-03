@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Veo demo stream (full product demo)",
+    "url": "backend/demo/demo_stream.mp4",
+    "demo_alerts": true,
+    "chat_script": "backend/demo/chat_demo.json",
+    "expect": "Streamer praises and drinks a Gatorade: verified tip, high chat reaction (x1.5), bounding box, spoken thank-you alert and card"
+  },
+  {
+    "name": "Veo streamer, no drink",
+    "url": "backend/demo/test_media/veo_streamer_no_drink.mp4",
+    "expect": "Negative control: nothing beverage-related, no flags"
+  },
+  {
+    "name": "Test card with Gatorade voiceover (mp4)",
+    "url": "backend/demo/test_media/testcard_gatorade_voice.mp4",
+    "expect": "Gatorade mention flagged, then rejected by the verifier because there is no real person on screen"
+  },
+  {
+    "name": "Test card with Gatorade voiceover (webm, as the browser uploads it)",
+    "url": "backend/demo/test_media/testcard_gatorade_voice.webm",
+    "expect": "Same as the mp4; checks webm handling and thumbnail extraction"
+  },
+  {
+    "name": "Test card with Gatorade voiceover (32s, several clips)",
+    "url": "backend/demo/test_media/testcard_gatorade_voice_long.mp4",
+    "chat_script": "backend/demo/chat_sample.json",
+    "expect": "Multi-clip run: previous-clip context, chat reaction scored, verifier rejection"
+  },
+  {
+    "name": "Lofi Girl (Twitch, live)",
+    "url": "https://www.twitch.tv/lofigirl",
+    "expect": "Animated character sipping from a mug: flagged but blocked as animated and prerecorded/looped; live Twitch chat"
+  },
+  {
+    "name": "shroud (Twitch, live)",
+    "url": "https://www.twitch.tv/shroud",
+    "expect": "Real streamer with busy chat; occasional real drinking moments get tipped"
+  }
+]

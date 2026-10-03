@@ -1,9 +1,26 @@
+# Secrets (both the payments API .env and backend/.env)
 .env
 .env.*
+*.env.local
 !.env.example
+
+# Python
 __pycache__/
 *.pyc
 .venv/
-.vercel/
 .pytest_cache/
+
+# Vercel
+.vercel/
+
+# Gemini detector runtime output
+backend/.chunks/
+backend/events.jsonl
+backend/evidence/
+backend/logs/
+
+# Dashboard
+node_modules/
+frontend/dist/
+
 .DS_Store

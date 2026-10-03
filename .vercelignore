@@ -1,0 +1,7 @@
+# Vercel only deploys the payments API (app/ via api/index.py).
+# The Gemini detector needs ffmpeg and long running workers, so it runs on a laptop or a VM.
+backend/
+frontend/
+tests/
+scripts/
+supabase/

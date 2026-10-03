@@ -28,7 +28,10 @@ def main(video_url: str) -> None:
         .execute()
         .data[0]
     )
-    creator = sb.table("creators").insert({"display_name": "Demo Streamer"}).execute().data[0]
+    # The handle is the "streamer id" typed in the Gemini detector dashboard (default: demo-streamer).
+    taken = sb.table("creators").select("id").ilike("handle", "demo-streamer").execute().data
+    creator_row = {"display_name": "Demo Streamer"} if taken else {"display_name": "Demo Streamer", "handle": "demo-streamer"}
+    creator = sb.table("creators").insert(creator_row).execute().data[0]
     video = (
         sb.table("videos")
         .insert({"url": video_url, "platform": "demo", "title": "Demo clip", "creator_id": creator["id"]})
@@ -40,11 +43,12 @@ def main(video_url: str) -> None:
     print("campaign_id ", campaign["id"])
     print("creator_id  ", creator["id"])
     print("video_id    ", video["id"])
+    print("handle      ", creator.get("handle") or "(demo-streamer already taken; set creators.handle yourself)")
     print()
     print("Open this link in a browser and finish Stripe test onboarding so the creator can be paid:")
     print(create_onboarding_link(creator["id"]))
     print()
-    print("Then sync status:  POST /creators/{creator_id}/refresh-status  (or wait for the account.updated webhook)")
+    print("Then sync status:  POST /creators/{creator_id}/refresh-status  ")
 
 
 if __name__ == "__main__":

@@ -47,3 +47,27 @@ class FundIn(BaseModel):
 
 class DevCreditIn(BaseModel):
     amount_cents: int = Field(gt=0, le=500_000)
+
+
+class StreamEventIn(BaseModel):
+    """A tip-worthy moment from the Gemini livestream detector (backend/), sent by its tipper step.
+
+    Mirrors the detector's BeverageEvent contract; unknown fields are kept in detections.meta.
+    """
+
+    model_config = {"extra": "allow"}
+
+    campaign_id: UUID
+    event_id: str = Field(min_length=1, max_length=100)
+    session_id: str = Field(min_length=1, max_length=100)
+    streamer_id: str = Field(min_length=1, max_length=100)  # creators.handle (or a creator uuid)
+    category: str = Field(min_length=1, max_length=60)
+    confidence: float = Field(ge=0, le=1)
+    description: str = Field(default="", max_length=1000)
+    quote: Optional[str] = Field(default=None, max_length=1000)
+    brand: Optional[str] = Field(default=None, max_length=100)
+    stream_offset_seconds: float = Field(ge=0)
+    suggested_tip_cents: int = Field(ge=0)
+    source_url: Optional[str] = Field(default=None, max_length=2000)  # stream URL or file; empty for webcam
+    message: Optional[str] = Field(default=None, max_length=200)  # on screen tip message
+    reasoning: Optional[str] = Field(default=None, max_length=2000)
