@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="base.css">
+<script src="phase.js"></script>
 <style>
   :root { --w: 1600px; --h: 900px; }
   .wrap { position: absolute; inset: 0; padding: 64px 72px; }
@@ -31,10 +32,12 @@
     <h2>Five tools, each with a real job.</h2>
     <div class="grid">
       <div class="tool card" style="--c: var(--supabase)">
-        <div class="role">Database</div>
+        <div class="role until-0">Database</div>
+        <div class="role from-1">Database + Compute</div>
         <h3>Supabase</h3>
         <ul>
-          <li><b>Postgres on Supabase compute</b> is the system of record: 7 tables and an append-only wallet ledger</li>
+          <li class="from-1"><b>Compute runs the scout agent:</b> Python, ffmpeg and Gemini in a service that never stops</li>
+          <li class="until-0"><b>Supabase Postgres</b> is the system of record: 7 tables and an append-only wallet ledger</li>
           <li><b>Money rules in SQL:</b> <code>reserve_tip</code> checks budget and cap under a row lock</li>
           <li><b>Row level security</b> on every table, <b>Auth</b> for the dashboard, <b>Realtime</b> on paid tips</li>
         </ul>
@@ -82,7 +85,8 @@
         <div class="line"><span style="--c: var(--gemini)">Gemini</span> sees the moment.</div>
         <div class="line"><span style="--c: var(--supabase)">Supabase</span> approves the budget.</div>
         <div class="line"><span style="--c: var(--stripe)">Stripe</span> pays the creator.</div>
-        <div class="foot">Hosted on <b>Vercel</b> · coded with <b>Claude</b></div>
+        <div class="foot until-0">Hosted on <b>Vercel</b> · coded with <b>Claude</b></div>
+        <div class="foot from-1">Scout on <b>Supabase Compute</b> · API on <b>Vercel</b><br>Coded with <b>Claude</b></div>
       </div>
     </div>
   </div>

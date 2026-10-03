@@ -119,3 +119,8 @@ body::before {
 }
 
 .footer .logo { font-size: 22px; color: var(--text); }
+
+/* Build-phase content (see render.sh): .from-1 appears once the scout runs on
+   Supabase Compute; .until-0 is what is true before that. */
+html:not([data-phase="1"]) .from-1 { display: none !important; }
+html[data-phase="1"] .until-0 { display: none !important; }

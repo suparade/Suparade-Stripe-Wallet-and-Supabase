@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- min-phase: 1. Render only after the scout is deployed on Supabase Compute and verified. -->
+<link rel="stylesheet" href="base.css">
+<script src="phase.js"></script>
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 60px 72px; }
+  .eyebrow { color: var(--supabase); }
+  h2 { font-size: 54px; font-weight: 800; letter-spacing: -0.02em; margin-top: 12px; }
+  h2 em { font-style: normal; color: var(--supabase); }
+  .lead { margin-top: 12px; font-size: 20px; line-height: 1.5; color: var(--muted); max-width: 1300px; }
+  .lead b { color: var(--text); font-weight: 600; }
+
+  .body { margin-top: 36px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; }
+  .panel { padding: 24px 26px; display: flex; flex-direction: column; }
+  .panel h4 { font-size: 14px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 16px; }
+
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+  .s { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 14px; padding: 18px 16px; border-radius: 12px; background: var(--panel-2); border: 1px solid #343444; }
+  .s.on { border-color: #3ecf8e77; background: linear-gradient(90deg, #3ecf8e16, var(--panel-2) 70%); }
+  .s .n { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 15px; background: #ffffff10; color: var(--muted); }
+  .s.on .n { background: #3ecf8e26; color: var(--supabase); }
+  .s b { display: block; font-size: 18px; font-weight: 700; }
+  .s small { display: block; margin-top: 3px; font-size: 14.5px; color: var(--muted); }
+  .s code { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--text); }
+  .where { display: flex; gap: 6px; }
+  .w { font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--k); color: var(--k); background: color-mix(in srgb, var(--k) 12%, transparent); white-space: nowrap; }
+
+  .why { display: flex; flex-direction: column; gap: 26px; }
+  .why div { padding-left: 16px; border-left: 3px solid var(--supabase); }
+  .why b { display: block; font-size: 19px; font-weight: 700; }
+  .why span { display: block; margin-top: 3px; font-size: 15.5px; line-height: 1.45; color: var(--muted); }
+  .svc { margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #3ecf8e10; border: 1px solid #3ecf8e66; font-size: 15px; color: var(--muted); }
+  .svc code { font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 700; color: var(--text); }
+  .svc .dot { background: var(--supabase); box-shadow: 0 0 0 4px #3ecf8e2a; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Supabase Compute</div>
+    <h2>Postgres holds the rules. <em>Compute runs the agents.</em></h2>
+    <p class="lead">The scout watches a live stream for as long as it runs. It needs <b>ffmpeg, streamlink and a process that never stops</b>, so it runs on <b>Supabase Compute</b>, inside our Supabase project, next to the database that limits what the agent can spend.</p>
+
+    <div class="body">
+      <div class="panel card">
+        <h4>One paid moment, and where each step runs</h4>
+        <div class="steps">
+          <div class="s on">
+            <span class="n">1</span>
+            <div><b>Watch the stream</b><small>streamlink and ffmpeg cut it into 10 s clips, for hours on end</small></div>
+            <div class="where"><span class="w" style="--k: var(--supabase)">Supabase Compute</span></div>
+          </div>
+          <div class="s on">
+            <span class="n">2</span>
+            <div><b>Find and verify the moment</b><small>The scout sends each clip to Gemini Flash, then Pro</small></div>
+            <div class="where"><span class="w" style="--k: var(--supabase)">Supabase Compute</span><span class="w" style="--k: var(--gemini)">Gemini</span></div>
+          </div>
+          <div class="s">
+            <span class="n">3</span>
+            <div><b>Ask to pay</b><small><code>POST /agent/stream-events</code> to the payments API</small></div>
+            <div class="where"><span class="w" style="--k: var(--vercel)">Vercel</span></div>
+          </div>
+          <div class="s">
+            <span class="n">4</span>
+            <div><b>Reserve the budget</b><small><code>reserve_tip</code> locks the campaign row, checks budget and cap</small></div>
+            <div class="where"><span class="w" style="--k: var(--supabase)">Supabase Postgres</span></div>
+          </div>
+          <div class="s">
+            <span class="n">5</span>
+            <div><b>Pay the creator</b><small>Connect transfer with an idempotency key</small></div>
+            <div class="where"><span class="w" style="--k: var(--stripe)">Stripe</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel card">
+        <h4>Why the scout runs on Compute</h4>
+        <div class="why">
+          <div><b>A full Linux machine</b><span>ffmpeg and streamlink are system binaries. Edge Functions don't give you a full Linux environment.</span></div>
+          <div><b>No time limit</b><span>A stream runs for hours. A Compute service runs as long as the work takes; serverless functions time out.</span></div>
+          <div><b>Next to the money rules</b><span>It runs in the same Supabase project as the Postgres functions that cap what the agent can spend.</span></div>
+          <div><b>Before Compute: a laptop</b><span>It needs ffmpeg and long-running workers, so it could not run serverless.</span></div>
+        </div>
+        <div class="svc"><span class="dot"></span><code>scout</code><span>Supabase Compute service · public · Active</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

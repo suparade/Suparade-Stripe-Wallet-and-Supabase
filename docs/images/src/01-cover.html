@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="base.css">
+<script src="phase.js"></script>
 <style>
   :root { --w: 1600px; --h: 900px; }
   .hero { position: absolute; left: 72px; right: 72px; top: 52px; height: 624px; display: grid; grid-template-columns: 580px 1fr; gap: 50px; align-items: center; }
@@ -72,8 +73,10 @@
     <div class="tools">
       <div class="tool" style="--c: var(--supabase)">
         <div class="name">Supabase</div>
-        <div class="job">Database</div>
-        <div class="how">Postgres on Supabase compute holds every money rule</div>
+        <div class="job until-0">Database</div>
+        <div class="job from-1">Database + Compute</div>
+        <div class="how until-0">Postgres holds the budget and every money rule</div>
+        <div class="how from-1">Postgres holds the money rules. Compute runs the scout agent.</div>
       </div>
       <div class="tool" style="--c: var(--stripe)">
         <div class="name">Stripe</div>
