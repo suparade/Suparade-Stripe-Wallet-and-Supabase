@@ -14,6 +14,13 @@
   --red: #f85149;
   --blue: #79c0ff;
   --violet: #a5a1ff;
+
+  /* One color per hackathon tool, used the same way on every image. */
+  --supabase: #3ecf8e;
+  --stripe: #7a73ff;
+  --gemini: #4f8ff7;
+  --claude: #d97757;
+  --vercel: #ffffff;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

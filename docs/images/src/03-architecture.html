@@ -23,7 +23,7 @@
   .arrow { text-align: center; color: var(--dim); font-size: 18px; line-height: 1; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .flow { align-self: center; text-align: center; font-size: 34px; color: var(--orange); font-weight: 800; }
-  .legend { position: absolute; left: 72px; bottom: 56px; display: flex; gap: 26px; font-size: 16px; color: var(--muted); }
+  .legend { position: absolute; left: 72px; right: 72px; bottom: 56px; display: flex; gap: 26px; font-size: 16px; color: var(--muted); }
   .legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 8px; vertical-align: -2px; }
   code { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--violet); }
 </style>
@@ -50,7 +50,7 @@
     </div>
     <div class="flow">→</div>
     <div class="zone">
-      <div class="label"><span>Payments API</span><span>Vercel</span></div>
+      <div class="label"><span>Payments API</span><span style="color:#fff;font-weight:700">Hosted on Vercel</span></div>
       <div class="nodes">
         <div class="node o"><b>Agent endpoint</b><small><code>POST /agent/stream-events</code><br>one call per confirmed moment</small></div>
         <div class="arrow">↓</div>
@@ -61,9 +61,9 @@
     <div class="zone">
       <div class="label"><span>Money + state</span><span></span></div>
       <div class="nodes">
-        <div class="node s"><b>Supabase Postgres</b><small>Campaigns, creators, detections, tips, append-only wallet ledger · money rules in SQL functions · RLS</small></div>
+        <div class="node s"><b>Supabase Postgres · database</b><small>Campaigns, creators, detections, tips, append-only wallet ledger · money rules in SQL functions · RLS</small></div>
         <div class="node p"><b>Stripe Connect</b><small>Transfer to the creator's account, with the agent's reason on it</small></div>
-        <div class="node s"><b>Realtime → dashboard</b><small>verifying → paying → paid, thank-you alert on stream</small></div>
+        <div class="node s"><b>Supabase Realtime</b><small>Every paid tip is published, so an on-stream overlay can show it</small></div>
       </div>
     </div>
   </div>
@@ -73,6 +73,8 @@
     <span><i style="background:#635bff"></i>Stripe</span>
     <span><i style="background:var(--orange)"></i>Suparade logic</span>
     <span><i style="background:var(--red)"></i>No money moves</span>
+    <span><i style="background:#ffffff"></i>Vercel</span>
+    <span style="margin-left:auto;color:var(--text)"><i style="background:var(--claude)"></i>Built with Claude Code</span>
   </div>
 </body>
 </html>

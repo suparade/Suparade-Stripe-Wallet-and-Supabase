@@ -19,6 +19,8 @@ Product placement works in film: a laptop appears in a scene because the brand p
 
 The agent is the user. The dashboard is the human side: it is where a person starts a stream session and watches what the agent decided and paid.
 
+![Brand sightings and creator tips: what the agent gets](docs/images/04-what-agents-get.png)
+
 ## How it works
 
 ![Watch, detect, decide, verify, pay, show](docs/images/02-how-it-works.png)
@@ -44,7 +46,11 @@ flowchart LR
 5. **Pay.** The payments API logs the moment in Supabase, reserves the tip against the campaign budget under a row lock, and sends a Stripe transfer to the creator's connected account.
 6. **Show.** The dashboard shows the flag go `verifying`, `paying`, then `paid` with the Stripe transfer id. In demo mode Gemini also writes, speaks and illustrates a thank-you alert.
 
+![The rules that stop a tip before money moves](docs/images/05-guardrails.png)
+
 ## What is in this repo
+
+![Architecture: the detector, the payments API on Vercel, Supabase and Stripe](docs/images/03-architecture.png)
 
 | Part | Folder | What it does | Runs on |
 | --- | --- | --- | --- |
@@ -56,12 +62,22 @@ flowchart LR
 
 ## Built with
 
+![Supabase, Stripe, Gemini, Claude and Vercel, each with its job](docs/images/06-built-with.png)
+
 | Technology | How Suparade uses it |
 | --- | --- |
 | **Supabase** | Postgres is the system of record for brands, campaigns, creators, videos, detections, tips and an append-only wallet ledger. Three `security definer` SQL functions hold every money rule. Row level security scopes brand data to its owner. Auth verifies dashboard users. The `tips` table is published to Realtime so an overlay can react the moment a tip is paid. |
 | **Gemini** | Flash analyses every clip (video and audio) into a JSON schema. Pro verifies each candidate and scores audience reaction from chat. Gemini also draws bounding boxes on evidence thumbnails, writes the thank-you line, speaks it (TTS) and generates a thank-you card. |
 | **Stripe** | Connect (Accounts v2, Express dashboard) pays creators by transfer, each with an idempotency key and the agent's reason in the description. Checkout plus a webhook tops up campaign budgets, designed to be paid by a Link Agent Wallet spend request. |
 | **Vercel** | Hosts the payments API as a Python function (`api/index.py`, `vercel.json`). |
+
+![Gemini: video, audio, chat, images and text in; JSON, text, speech and images out](docs/images/07-gemini-multimodal.png)
+
+![Stripe: the agent pays creators by Connect transfer, inside hard limits](docs/images/08-stripe-agent-payments.png)
+
+![Supabase: every money rule lives in Postgres](docs/images/09-supabase-database.png)
+
+![Coded with Claude, hosted on Vercel](docs/images/10-claude-and-vercel.png)
 
 ## Quick start
 

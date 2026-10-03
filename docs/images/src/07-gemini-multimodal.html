@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 60px 72px; }
+  .eyebrow { color: var(--gemini); }
+  h2 { font-size: 54px; font-weight: 800; letter-spacing: -0.02em; margin-top: 12px; }
+  h2 em { font-style: normal; background: linear-gradient(90deg, #4f8ff7, #9b72cb 60%, #d96570); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { margin-top: 12px; font-size: 20px; color: var(--muted); }
+  .lead b { color: var(--text); font-weight: 600; }
+
+  .head, .row { display: grid; grid-template-columns: 300px 390px 40px 1fr; align-items: center; column-gap: 18px; }
+  .head { margin-top: 30px; padding: 0 22px 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .rows { display: flex; flex-direction: column; gap: 12px; }
+  .row { padding: 18px 22px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+  .row.hi { border-color: #4f8ff766; background: linear-gradient(90deg, #4f8ff714, var(--panel) 60%); }
+  .step b { display: block; font-size: 19px; font-weight: 700; }
+  .step code { display: block; margin-top: 3px; font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--violet); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .m { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; padding: 5px 11px; border-radius: 8px; border: 1px solid var(--k); color: var(--k); background: color-mix(in srgb, var(--k) 12%, transparent); }
+  .vid { --k: #79c0ff; } .aud { --k: #d2a8ff; } .chat { --k: #3fb950; } .txt { --k: #c9d1d9; } .img { --k: #e3b341; }
+  .json { --k: #ff7a1a; } .box { --k: #ff7b72; } .spk { --k: #d2a8ff; }
+  .arrow { color: var(--gemini); font-size: 22px; font-weight: 800; text-align: center; }
+  .out { display: flex; align-items: center; gap: 12px; }
+  .out span.note { font-size: 15px; color: var(--muted); line-height: 1.35; }
+  .group { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin: 6px 0 -2px 22px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Gemini · multimodal AI</div>
+    <h2>Gemini is <em>multimodal</em> from end to end.</h2>
+    <p class="lead">Each clip goes in as <b>raw video with its audio</b>. No frame sampling, no transcript step: one call sees the sip and hears the praise.</p>
+
+    <div class="head"><span>Step · default model</span><span>In</span><span></span><span>Out</span></div>
+    <div class="rows">
+      <div class="row hi">
+        <div class="step"><b>Watch every 10 s clip</b><code>gemini-flash-latest</code></div>
+        <div class="chips"><span class="m vid">▶ Video</span><span class="m aud">♪ Audio</span><span class="m chat">≡ Live chat</span><span class="m txt">Last clip's summary</span></div>
+        <div class="arrow">→</div>
+        <div class="out"><span class="m json">{ } Typed JSON</span><span class="note">moments, quotes, sentiment, staged or replay, brand screen time, safety flags</span></div>
+      </div>
+      <div class="row hi">
+        <div class="step"><b>Verify each candidate</b><code>gemini-pro-latest</code></div>
+        <div class="chips"><span class="m vid">▶ Video</span><span class="m aud">♪ Audio</span><span class="m chat">≡ Chat around it</span></div>
+        <div class="arrow">→</div>
+        <div class="out"><span class="m json">{ } JSON</span><span class="note">confirmed or rejected, plus the audience's reaction (up to 1.5× tip)</span></div>
+      </div>
+      <div class="row">
+        <div class="step"><b>Box the evidence</b><code>gemini-flash-latest</code></div>
+        <div class="chips"><span class="m img">▣ Thumbnail</span></div>
+        <div class="arrow">→</div>
+        <div class="out"><span class="m box">⬚ Bounding boxes</span><span class="note">around each drink in the frame</span></div>
+      </div>
+      <div class="group">Thank-you alert</div>
+      <div class="row">
+        <div class="step"><b>Write it</b><code>gemini-flash-latest</code></div>
+        <div class="chips"><span class="m txt">Aa The moment</span></div>
+        <div class="arrow">→</div>
+        <div class="out"><span class="m txt">Aa Text</span><span class="note">the line shown on stream</span></div>
+      </div>
+      <div class="row">
+        <div class="step"><b>Speak it</b><code>gemini-3.8-flash-tts</code></div>
+        <div class="chips"><span class="m txt">Aa Text</span></div>
+        <div class="arrow">→</div>
+        <div class="out"><span class="m spk">♪ Speech</span><span class="note">read aloud over the stream</span></div>
+      </div>
+      <div class="row">
+        <div class="step"><b>Illustrate it</b><code>gemini-3.1-flash-image</code></div>
+        <div class="chips"><span class="m img">▣ Thumbnail</span><span class="m txt">Aa Prompt</span></div>
+        <div class="arrow">→</div>
+        <div class="out"><span class="m img">▣ Image</span><span class="note">a thank-you card made from the evidence frame</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
