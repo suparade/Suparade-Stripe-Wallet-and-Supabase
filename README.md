@@ -1,5 +1,7 @@
 # Suparade
 
+![Suparade: product placement for live streams, run by AI agents](docs/images/01-cover.png)
+
 **Product placement for live streams, run by AI agents.**
 
 A brand funds a campaign. A scout agent watches live streams with Gemini (video, audio and chat together) and spots the moment a streamer drinks, shows or praises the product. A second, stricter Gemini pass verifies the moment. A tipper step then pays the streamer a real Stripe transfer out of the campaign budget held in Supabase, and a thank-you alert appears on the stream.
@@ -18,6 +20,8 @@ Product placement works in film: a laptop appears in a scene because the brand p
 The agent is the user. The dashboard is the human side: it is where a person starts a stream session and watches what the agent decided and paid.
 
 ## How it works
+
+![Watch, detect, decide, verify, pay, show](docs/images/02-how-it-works.png)
 
 ```mermaid
 flowchart LR
