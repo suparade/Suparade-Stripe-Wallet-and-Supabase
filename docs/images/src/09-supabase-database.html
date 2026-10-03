@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="base.css">
+<script src="phase.js"></script>
 <style>
   :root { --w: 1600px; --h: 900px; }
   .wrap { position: absolute; inset: 0; padding: 60px 72px; }
@@ -40,7 +41,7 @@
   <div class="wrap">
     <div class="eyebrow">Supabase · database</div>
     <h2>Every money rule lives <em>in Postgres.</em></h2>
-    <p class="lead">Our database runs on <b>Supabase compute</b>. Stripe only moves money after Postgres says yes.</p>
+    <p class="lead"><span class="until-0">The budget lives in <b>Supabase Postgres</b>.</span><span class="from-1"><b>Postgres holds the rules. Compute runs the agents.</b></span> Stripe only moves money after Postgres says yes.</p>
 
     <div class="body">
       <div class="panel card">

@@ -3,14 +3,16 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="base.css">
+<script src="phase.js"></script>
 <style>
   :root { --w: 1600px; --h: 900px; }
   .wrap { position: absolute; inset: 0; padding: 72px; }
   h2 { font-size: 56px; font-weight: 800; letter-spacing: -0.02em; margin-top: 14px; }
   .zones { position: absolute; top: 260px; left: 72px; right: 72px; display: grid; grid-template-columns: 1.55fr 36px 1fr 36px 1.1fr; gap: 10px; }
+  html[data-phase="1"] .zone.det { border: 1px solid #3ecf8e88; background: #3ecf8e08; }
   .zone { border: 1px dashed var(--line); border-radius: 22px; padding: 22px 20px 20px; height: 460px; }
   .zone .label { font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 18px; display: flex; justify-content: space-between; }
-  .zone .label span:last-child { color: var(--muted); letter-spacing: 0.04em; text-transform: none; font-weight: 500; }
+  .zone .label span + span { color: var(--muted); letter-spacing: 0.04em; text-transform: none; font-weight: 500; }
   .nodes { display: flex; flex-direction: column; gap: 14px; }
   .node { padding: 16px 18px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
   .node b { font-size: 20px; display: block; }
@@ -34,8 +36,8 @@
     <h2>Eyes on the stream, a wallet with guardrails.</h2>
   </div>
   <div class="zones">
-    <div class="zone">
-      <div class="label"><span>Detector</span><span>FastAPI · laptop or VM</span></div>
+    <div class="zone det">
+      <div class="label"><span>Detector</span><span class="until-0">FastAPI · laptop or VM</span><span class="from-1" style="color:var(--supabase);font-weight:700">Supabase Compute</span></div>
       <div class="nodes">
         <div class="node"><b>Live stream</b><small>Twitch, YouTube, webcam, screen share or file → ffmpeg 10 s clips + chat</small></div>
         <div class="two">
