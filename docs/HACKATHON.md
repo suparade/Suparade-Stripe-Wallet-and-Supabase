@@ -51,8 +51,11 @@ The dashboard is the human side. A person starts a session, then watches every d
 - **Row level security** on every table: brand owners see only their own data, and paid tips are public so an overlay can show them.
 - **Auth** to verify dashboard users before funding or onboarding.
 - **Realtime.** The `tips` table is published so an overlay receives a tip the moment it is paid.
+- **Compute (private alpha).** The detector runs as a Compute service built from `backend/Dockerfile`: ffmpeg, streamlink and long-running stream workers, in the same project as the database. The setup is `[compute.detector]` in `supabase/config.toml`, and `scripts/deploy_detector.sh` deploys it. Two more Compute services run next to it. `mcp` is an MCP server, so any agent can ask for brand sightings, tips and budget left, or send the scout to a stream. `overlay` is the browser source a streamer adds to OBS, and Realtime pushes each paid tip to it. Both read the database with the credentials Compute passes them, and neither moves money.
 
 ### Gemini
+
+Gemini takes in video, audio, images and text, and returns JSON, text, speech and images. Every call is mapped to the code in [GEMINI.md](GEMINI.md).
 
 - **Multimodal analysis of every clip.** Video and audio together, so a silent sip and a spoken "this Gatorade hits" are both caught. The response is a typed JSON schema.
 - **A second model as auditor.** Candidates are re-checked by Gemini Pro with a sceptical prompt before anything is paid.
@@ -70,7 +73,7 @@ The dashboard is the human side. A person starts a session, then watches every d
 
 ### Vercel
 
-- Hosts the payments API as a Python function. The detector needs ffmpeg and long-running workers, so it runs beside it on a laptop or VM.
+- Hosts the payments API as a Python function. The detector needs ffmpeg and long-running workers, so it runs on Supabase Compute instead.
 
 ## Why you can trust this agent with money
 
@@ -118,9 +121,10 @@ We would rather be exact than impressive. "Working" below means the code path is
 | Evidence, bounding boxes, spoken alert and card | Working |
 | Funding through Link Agent Wallet | Wired (Checkout and webhook), not yet run end to end. The demo credits the budget with a sandbox-only route |
 | Fully autonomous spending | Tipping is autonomous within the funded budget. Funding through Link needs a human approval per spend request |
-| The alert on the creator's real stream | Shown in our dashboard. Putting it inside a Twitch or YouTube broadcast is a separate integration |
+| The alert on the creator's real stream | An overlay page on Supabase Compute shows each paid tip through Realtime, ready to add to OBS as a browser source. Not yet tried in a live broadcast |
+| An MCP server for agents | Working on Supabase Compute: sightings, tips, budgets, and starting or stopping the scout, tested against the live campaign |
 | Real money | None. Test mode only |
-| The detector on serverless | No. It runs on a laptop or VM |
+| The detector in the cloud | Deployed on Supabase Compute (private alpha) as one instance. `run_e2e.sh` runs it locally |
 | Many campaigns at once | One campaign per detector process |
 
 ## What we would build next
@@ -128,7 +132,7 @@ We would rather be exact than impressive. "Working" below means the code path is
 - **Many brands, many scouts.** A campaign per brand, with one scout per stream and an orchestrator allocating budget across them.
 - **Stream discovery.** An agent that finds streams where the brand already appears or would fit.
 - **Beyond drinks.** The detection schema is beverage-specific today. The schema already has a second campaign type, `cool_moment`, for tipping highly clippable moments so the brand travels with the clip.
-- **Creator onboarding and overlays.** A browser source streamers add to their broadcast, fed by Supabase Realtime.
+- **Creator onboarding.** The overlay exists; next is a setup page where a streamer connects Stripe and copies their own overlay URL.
 - **Disclosure and consent.** Paid placement needs sponsorship disclosure, and creators should opt in to being watched and paid. Both belong in the product before real money does.
 - **Link funding end to end**, and tips over a threshold routed to a human for approval.
 

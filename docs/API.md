@@ -99,7 +99,9 @@ Callers can only act on their own creator profile or their own brand's campaign;
 
 ## Detector API
 
-Base URL: `http://localhost:8000`. The dashboard's dev server proxies `/api`, `/evidence` and `/ws` to it.
+Base URL: `http://localhost:8000` locally, or `https://pvoesovsparqqzosgwki.supabase.co/compute/v1/detector` on Supabase Compute. The dashboard's dev server proxies `/api`, `/evidence` and `/ws` to the local one.
+
+When `DETECTOR_KEY` is set, as it is on Compute, the calls that start, feed or stop a session need it in the `X-Detector-Key` header: `POST /api/sessions`, `POST /api/sessions/{id}/chunk`, `POST /api/sessions/{id}/chat` and `DELETE /api/sessions/{id}`. A missing or wrong key returns `401 invalid_detector_key`. Everything else stays open. Locally the key is empty, so every endpoint is open.
 
 | Method and path | Purpose |
 | --- | --- |
@@ -120,10 +122,10 @@ Base URL: `http://localhost:8000`. The dashboard's dev server proxies `/api`, `/
 | Field | Type | Meaning |
 | --- | --- | --- |
 | `source` | `"url"` or `"browser"` | A URL or file the server pulls, or clips the browser uploads |
-| `url` | string | Twitch or YouTube live URL, or a local file path. Required for `source: "url"` |
+| `url` | string | Twitch or YouTube live URL, or a video file in `backend/demo/`. Other local paths return `400`. Required for `source: "url"` |
 | `streamer_id` | string | Matches `creators.handle`. Defaults to `demo-streamer` |
 | `demo_alerts` | boolean | Generate the spoken thank-you alert and card for paid tips |
-| `chat_script` | string | Path to a JSON chat script to replay alongside the stream |
+| `chat_script` | string | Path to a JSON chat script in `backend/demo/` to replay alongside the stream |
 
 ### WebSocket messages
 

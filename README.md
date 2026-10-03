@@ -54,11 +54,14 @@ flowchart LR
 
 | Part | Folder | What it does | Runs on |
 | --- | --- | --- | --- |
-| Gemini detector | `backend/` | Cuts streams into clips, Gemini analysis, tip policy, verifier, chat reaction, evidence, thank-you alerts | Laptop or VM (needs ffmpeg), port 8000 |
+| Gemini detector | `backend/` | Cuts streams into clips, Gemini analysis, tip policy, verifier, chat reaction, evidence, thank-you alerts | Supabase Compute (`backend/Dockerfile`), or locally on port 8000 (needs ffmpeg) |
 | Dashboard | `frontend/` | React and Vite monitor: stream tiles, flag feed, chat, evidence with bounding boxes | Port 5173 |
 | Payments API | `app/`, `api/` | Campaign budgets, creators, detections and tips; Stripe Connect payouts; Link funding checkout | Vercel, or locally on port 8001 |
 | Database | `supabase/migrations/` | Tables, money functions, row level security, Realtime publication | Supabase |
-| Scripts | `scripts/` | One-command end to end run, demo seed, Stripe check | Local |
+| MCP server | `supabase/compute/mcp/` | Lets any agent connect over MCP: brand sightings, tips, budget left, and the scout's status, start and stop | Supabase Compute |
+| Stream overlay | `supabase/compute/overlay/` | The page a streamer adds to OBS as a browser source: shows each paid tip the moment Realtime pushes it | Supabase Compute |
+| Compute config | `supabase/config.toml` | The three Compute services: the detector (Dockerfile, 4 GB, 2 vCPU, one instance), the MCP server and the overlay | Supabase |
+| Scripts | `scripts/` | One-command end to end run, Compute deploy, demo seed, Stripe check | Local |
 
 ## Built with
 
@@ -66,8 +69,8 @@ flowchart LR
 
 | Technology | How Suparade uses it |
 | --- | --- |
-| **Supabase** | Postgres is the system of record for brands, campaigns, creators, videos, detections, tips and an append-only wallet ledger. Three `security definer` SQL functions hold every money rule. Row level security scopes brand data to its owner. Auth verifies dashboard users. The `tips` table is published to Realtime so an overlay can react the moment a tip is paid. |
-| **Gemini** | Flash analyses every clip (video and audio) into a JSON schema. Pro verifies each candidate and scores audience reaction from chat. Gemini also draws bounding boxes on evidence thumbnails, writes the thank-you line, speaks it (TTS) and generates a thank-you card. |
+| **Supabase** | Postgres is the system of record for brands, campaigns, creators, videos, detections, tips and an append-only wallet ledger. Three `security definer` SQL functions hold every money rule. Row level security scopes brand data to its owner. Auth verifies dashboard users. The `tips` table is published to Realtime so an overlay can react the moment a tip is paid. Compute (private alpha) runs three services in the same project as the database: the detector itself, ffmpeg and long-running stream workers included; an MCP server that gives any agent brand sightings, tips and budgets; and the stream overlay, fed by Realtime. |
+| **Gemini** | Multimodal end to end ([details](docs/GEMINI.md)). Flash analyses every clip (video and audio) into a JSON schema. Pro verifies each candidate and scores audience reaction from chat. Gemini also draws bounding boxes on evidence thumbnails, writes the thank-you line, speaks it (TTS) and generates a thank-you card. |
 | **Stripe** | Connect (Accounts v2, Express dashboard) pays creators by transfer, each with an idempotency key and the agent's reason in the description. Checkout plus a webhook tops up campaign budgets, designed to be paid by a Link Agent Wallet spend request. |
 | **Vercel** | Hosts the payments API as a Python function (`api/index.py`, `vercel.json`). |
 
@@ -89,7 +92,23 @@ cp backend/.env.example backend/.env    # GEMINI_API_KEY and SUPARADE_CAMPAIGN_I
 ./scripts/run_e2e.sh
 ```
 
-The script starts the payments API (port 8001), the detector (port 8000) and the dashboard (port 5173), tops up the sandbox budget if it is low, sends one $0.50 test tip to prove the money path, then plays the demo stream with real Gemini analysis and real Stripe sandbox payouts. Pass a file path or a Twitch or YouTube live URL to watch something else.
+The script starts the payments API (port 8001), the detector (port 8000) and the dashboard (port 5173), tops up the sandbox budget if it is low, sends one $0.50 test tip to prove the money path, then plays the demo stream with real Gemini analysis and real Stripe sandbox payouts. Pass a video in `backend/demo/` or a Twitch or YouTube live URL to watch something else.
+
+To deploy the detector to Supabase Compute, run `./scripts/deploy_detector.sh` ([details](docs/SETUP.md#deploying-the-detector-to-supabase-compute)). The MCP server and the overlay need no secrets, because Compute passes them the project URL and keys:
+
+```bash
+npx -y supabase@latest compute deploy mcp overlay --project-ref pvoesovsparqqzosgwki
+```
+
+To connect an agent such as Claude Code, use the keys from `.env` and `backend/.env.compute`:
+
+```bash
+claude mcp add --transport http suparade https://pvoesovsparqqzosgwki.supabase.co/compute/v1/mcp/mcp --header "X-Agent-Key: $AGENT_API_KEY" --header "X-Detector-Key: $DETECTOR_KEY"
+```
+
+The overlay for OBS is `https://pvoesovsparqqzosgwki.supabase.co/compute/v1/overlay?campaign=<campaign id>`. Add `&test` to show a sample alert, or `&debug` to see the Realtime connection.
+
+To run the dashboard against the detector on Compute instead of the local one, run `npm run dev:compute` in `frontend/` and open http://localhost:5174. Watching needs nothing else. Starting, feeding or stopping a stream needs the detector's key, as `DETECTOR_KEY` in the environment or in `backend/.env.compute`; the dev server adds it to its requests, so it never reaches the browser.
 
 To try detection alone, without Supabase or Stripe, leave `SUPARADE_API_URL` empty in `backend/.env`. Tips are then simulated.
 
@@ -98,11 +117,12 @@ To try detection alone, without Supabase or Stripe, leave `SUPARADE_API_URL` emp
 | Page | What it covers |
 | --- | --- |
 | [docs/HACKATHON.md](docs/HACKATHON.md) | Submission write-up: the idea, fit with the prompt, sponsor technology, demo walkthrough, what is real and what is not, roadmap |
+| [docs/GEMINI.md](docs/GEMINI.md) | Every Gemini call: video, audio, image and text in; JSON, text, speech and images out; models and code links |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Components, the life of one moment, event states, failure handling, deployment |
 | [docs/AGENT_DECISIONS.md](docs/AGENT_DECISIONS.md) | What the agent looks for, every rule that blocks a tip, verification, and how the amount is priced |
 | [docs/DATA_MODEL.md](docs/DATA_MODEL.md) | Supabase schema, money functions, row level security, Realtime |
 | [docs/API.md](docs/API.md) | Detector API and WebSocket messages, payments API, the event contract, error codes |
-| [docs/SETUP.md](docs/SETUP.md) | Full setup, every environment variable, tests, Vercel deployment, troubleshooting |
+| [docs/SETUP.md](docs/SETUP.md) | Full setup, every environment variable, tests, Vercel and Supabase Compute deployment, troubleshooting |
 | [backend/README.md](backend/README.md) | Detector quick reference |
 
 ## Status
@@ -112,11 +132,14 @@ What runs today:
 - Detection, tip policy, verification, chat reaction, evidence clips with bounding boxes and demo thank-you alerts.
 - Real Stripe sandbox transfers to an onboarded creator, with the budget enforced in Supabase.
 - Twitch and YouTube live URLs, webcam, screen share and local files as sources.
+- The detector deployed on Supabase Compute at a public URL, with a key on every endpoint that starts, feeds or stops a session.
+- An MCP server on Supabase Compute. Any agent with the agent key can read brand sightings, tips and budgets, and start or stop the scout.
+- A stream overlay on Supabase Compute that shows each paid tip through Realtime. It has not been tried inside OBS during a live broadcast yet.
 
 Known limits:
 
 - **Link Agent Wallet funding is wired but not yet exercised end to end.** The Checkout session and the webhook exist; the demo credits the budget with the sandbox-only dev credit route. Link spend requests also need a human approval in the Link app, within 10 minutes.
-- **The detector is not serverless.** It needs ffmpeg and long-running workers, so it runs on a laptop or VM. Only the payments API deploys to Vercel.
+- **The detector runs as one instance.** It needs ffmpeg and long-running workers, so it runs on Supabase Compute rather than Vercel, and its sessions are held in memory, so a second instance would split them. Supabase Compute is in private alpha.
 - **Detector sessions live in memory.** Restarting it stops the streams it was watching. Paid tips are safe in Supabase.
 - **One campaign per detector process.** The sponsor brand, competitors and campaign id come from `backend/.env`.
 - A tip left `pending` by a Stripe network error is retried by sending the same event or detection again; the detector does this automatically up to three times.
@@ -124,11 +147,12 @@ Known limits:
 ## Tests
 
 ```bash
-pytest                                            # payments API and detector, 34 tests
-python -m unittest discover -s backend/tests -t . # detector only, 22 tests
+pytest                                            # payments API, detector and MCP server, 55 tests
+python -m unittest discover -s backend/tests -t . # detector only, 25 tests
+node --test supabase/compute/overlay/overlay.test.mjs frontend/detectorProxy.test.js  # overlay and dashboard proxy, 13 tests
 ```
 
-Both suites pass on Python 3.12. They use fakes for Supabase, Stripe and Gemini, so they need no keys and move no money.
+All three suites pass (Python 3.12, Node 26). They use fakes for Supabase, Stripe and Gemini, so they need no keys and move no money.
 
 ## Team
 

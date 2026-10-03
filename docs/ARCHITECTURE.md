@@ -12,7 +12,7 @@ flowchart TB
         S3["Local file (demo replay)"]
     end
 
-    subgraph Detector["Detector: backend/ (FastAPI, port 8000)"]
+    subgraph Detector["Detector: backend/ (FastAPI on Supabase Compute, port 8000 locally)"]
         U["url_source<br>streamlink + ffmpeg"]
         BR["browser_source<br>uploaded webm clips"]
         SM["session_manager<br>one worker per stream"]
@@ -59,7 +59,7 @@ flowchart TB
 
 | Component | Files | Responsibility |
 | --- | --- | --- |
-| Sources | `backend/sources/` | Turn a stream into standalone clips. `url_source` pipes `streamlink` into `ffmpeg`, re-encodes to 480p and forces a keyframe at every segment boundary so each 10 second clip is a small playable mp4. A local file path is replayed in real time. `browser_source` accepts webm clips the dashboard records with `MediaRecorder`. |
+| Sources | `backend/sources/` | Turn a stream into standalone clips. `url_source` pipes `streamlink` into `ffmpeg`, re-encodes to 480p and forces a keyframe at every segment boundary so each 10 second clip is a small playable mp4. A video in `backend/demo/` is replayed in real time. `browser_source` accepts webm clips the dashboard records with `MediaRecorder`. |
 | Session manager | `backend/session_manager.py` | One session per stream. A single worker analyses clips in order so each clip can receive the previous clip's summary. Runs exposure accounting, the tip policy, verification and payment. |
 | Analyzer | `backend/gemini_analyzer.py` | Sends one clip (video and audio) plus chat to Gemini with a JSON response schema. Retries 429 and 5xx responses with exponential backoff. |
 | Tip policy | `backend/tip_policy.py` | Pure functions that return the reasons a moment is blocked. Holds per-session cooldown and repetition state. |
@@ -71,6 +71,8 @@ flowchart TB
 | Payments API | `app/` | Agent routes, creator onboarding, campaign funding, Stripe webhook. Uses the Supabase service role key. |
 | Database | `supabase/migrations/` | Schema, three money functions, row level security, Realtime publication. See [DATA_MODEL.md](DATA_MODEL.md). |
 | Dashboard | `frontend/` | Stream tiles, the flag feed, chat panel, evidence thumbnails with boxes, campaign budget in the header. |
+| MCP server | `supabase/compute/mcp/` | MCP tools for agents: campaigns, brand sightings, tips, and the scout's status, start and stop. Reads Postgres with the service key Compute provides. Checks agent keys with the payments API. |
+| Overlay | `supabase/compute/overlay/` | The OBS browser source. The viewer's browser subscribes to Realtime on `tips` and shows each paid tip. |
 
 ## The life of one moment
 
@@ -156,11 +158,15 @@ Money moves at most once per moment, even when calls are retried.
 | Piece | Where | Why |
 | --- | --- | --- |
 | Payments API | Vercel (`api/index.py`, `vercel.json`) or any host running `uvicorn app.main:app` | Stateless request and response. `.vercelignore` keeps the detector out of the deployment. |
-| Detector | Laptop or VM | Needs ffmpeg, streamlink and long-running workers. |
-| Dashboard | Anywhere static files can be served, or `npm run dev` | Talks to the detector over HTTP and WebSocket. |
+| Detector | Supabase Compute (`backend/Dockerfile`, `[compute.detector]` in `supabase/config.toml`, deployed by `scripts/deploy_detector.sh`), or locally | Needs ffmpeg, streamlink and long-running workers. Compute runs them in the same project as the database, with no time limit. One instance, because sessions live in memory. |
+| MCP server | Supabase Compute (`supabase/compute/mcp/`, Dockerfile runtime, 2 GB, 1 vCPU, public) | Stateless. Stores no agent key: the payments API checks `X-Agent-Key`, and `X-Detector-Key` is passed through to the detector for start and stop. Never moves money. |
+| Overlay | Supabase Compute (`supabase/compute/overlay/`, Node runtime, 2 GB, 1 vCPU, public) | Serves one page with the public URL and browser-safe key Compute provides. Row level security lets anyone read paid tips only. |
+| Dashboard | Anywhere static files can be served, `npm run dev` (local detector) or `npm run dev:compute` (the detector on Supabase Compute, port 5174) | Talks to the detector over HTTP and WebSocket through the dev server's proxy, which adds `X-Detector-Key` on the server side. |
 | Database | Supabase | Run the migrations in `supabase/migrations/` in order. |
 
-The detector finds the payments API through `SUPARADE_API_URL`. Point it at the Vercel URL in production, or `http://localhost:8001` locally.
+The detector finds the payments API through `SUPARADE_API_URL`. Point it at the Vercel URL in production, or `http://localhost:8001` locally. The Compute container cannot reach localhost, so the deploy keeps only an `https://` URL; without one, tips are simulated.
+
+The deployed detector has a public URL, so `DETECTOR_KEY` is set there: starting, feeding or stopping a session needs the `X-Detector-Key` header. Health, events and evidence stay open. Locally the key is empty and every endpoint is open.
 
 ## Design choices
 

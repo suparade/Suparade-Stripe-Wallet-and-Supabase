@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:compute": "vite --config vite.compute.config.js",
     "build": "vite build",
     "preview": "vite preview"
   },

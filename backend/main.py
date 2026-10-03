@@ -4,11 +4,12 @@ FastAPI app: HTTP + WebSocket API for the beverage detector.
 Run:  .venv/bin/uvicorn backend.main:app --reload --port 8000
 """
 
+import hmac
 import logging
 from pathlib import Path
 from typing import Literal, Optional
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -28,6 +29,12 @@ app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGINS,
                    allow_methods=["*"], allow_headers=["*"])
 config.EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/evidence", StaticFiles(directory=config.EVIDENCE_DIR), name="evidence")
+
+
+def require_key(x_detector_key: str = Header(default="")) -> None:
+    """Guards everything that starts, feeds or stops a session. Open when DETECTOR_KEY is unset (local dev)."""
+    if config.DETECTOR_KEY and not hmac.compare_digest(x_detector_key.encode(), config.DETECTOR_KEY.encode()):
+        raise HTTPException(401, "invalid_detector_key")
 
 
 class CreateSession(BaseModel):
@@ -59,8 +66,14 @@ async def payments_status():
     return await payments.campaign_status()
 
 
-@app.post("/api/sessions")
+@app.post("/api/sessions", dependencies=[Depends(require_key)])
 async def create_session(body: CreateSession):
+    # Local files only from backend/demo/: /media serves a session's file, and the portal's key route lets
+    # anyone start a session, so any other path would let them download any file (/proc/self/environ).
+    demo_dir = (config.BACKEND_DIR / "demo").resolve()
+    for path in (body.url, body.chat_script):
+        if path and Path(path).exists() and not Path(path).resolve().is_relative_to(demo_dir):
+            raise HTTPException(400, "local files must be in backend/demo/")
     try:
         s = await manager.create(body.source, body.streamer_id, body.url,
                                  demo_alerts=body.demo_alerts, chat_script=body.chat_script)
@@ -74,7 +87,7 @@ async def list_sessions():
     return [s.summary() for s in manager.sessions.values()]
 
 
-@app.post("/api/sessions/{session_id}/chunk")
+@app.post("/api/sessions/{session_id}/chunk", dependencies=[Depends(require_key)])
 async def upload_chunk(session_id: str, file: UploadFile = File(...),
                        duration: float = Form(config.CHUNK_SECONDS)):
     s = manager.sessions.get(session_id)
@@ -96,7 +109,7 @@ async def session_media(session_id: str):
     return FileResponse(s.url)
 
 
-@app.post("/api/sessions/{session_id}/chat")
+@app.post("/api/sessions/{session_id}/chat", dependencies=[Depends(require_key)])
 async def post_chat(session_id: str, body: ChatPost):
     """Inject chat messages (dashboard input, hype bursts, demos)."""
     s = manager.sessions.get(session_id)
@@ -111,7 +124,7 @@ async def post_chat(session_id: str, body: ChatPost):
     return {"added": len(msgs[:50])}
 
 
-@app.delete("/api/sessions/{session_id}")
+@app.delete("/api/sessions/{session_id}", dependencies=[Depends(require_key)])
 async def delete_session(session_id: str):
     await manager.stop(session_id)
     return {"ok": True}
