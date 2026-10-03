@@ -1,0 +1,114 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+:root {
+  --bg: #0b0b0f;
+  --panel: #14141b;
+  --panel-2: #1b1b24;
+  --line: #2a2a36;
+  --text: #f4f4f7;
+  --muted: #a1a1b0;
+  --dim: #6c6c7c;
+  --orange: #ff7a1a;
+  --orange-soft: #ff7a1a22;
+  --green: #3fb950;
+  --red: #f85149;
+  --blue: #79c0ff;
+  --violet: #a5a1ff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 600px at 85% -10%, #ff7a1a1f, transparent 60%),
+    radial-gradient(700px 500px at -5% 110%, #635bff1a, transparent 60%);
+  pointer-events: none;
+}
+
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+.eyebrow {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.logo .mark {
+  width: 1em;
+  height: 1em;
+  border-radius: 0.28em;
+  background: var(--orange);
+  position: relative;
+}
+
+.logo .mark::after {
+  content: "";
+  position: absolute;
+  left: 34%;
+  top: 26%;
+  border-left: 0.36em solid var(--bg);
+  border-top: 0.24em solid transparent;
+  border-bottom: 0.24em solid transparent;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+.footer {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--dim);
+  font-size: 17px;
+}
+
+.footer .logo { font-size: 22px; color: var(--text); }

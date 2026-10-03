@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 72px; }
+  h2 { font-size: 60px; font-weight: 800; letter-spacing: -0.02em; margin-top: 14px; }
+  h2 em { font-style: normal; color: var(--orange); }
+  .grid { margin-top: 64px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .step { padding: 28px 30px 30px; position: relative; min-height: 272px; }
+  .num { font-size: 15px; font-weight: 700; color: var(--dim); letter-spacing: 0.1em; }
+  .step h3 { font-size: 34px; font-weight: 800; margin: 10px 0 12px; display: flex; align-items: center; gap: 14px; }
+  .step h3 .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; }
+  .step p { font-size: 19px; line-height: 1.5; color: var(--muted); }
+  .step .by { position: absolute; left: 30px; bottom: 24px; font-size: 14px; color: var(--dim); }
+  .step .by b { color: var(--text); font-weight: 600; }
+  .step.hi { border-color: #ff7a1a66; background: linear-gradient(180deg, #ff7a1a14, var(--panel)); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2>From a sip on stream to a <em>paid creator</em>, in seconds.</h2>
+    <div class="grid">
+      <div class="step card">
+        <div class="num">01</div>
+        <h3><span class="ic" style="background:#79c0ff22;color:var(--blue)">◉</span>Watch</h3>
+        <p>The stream is cut into 10 second clips. Each clip carries its video, its audio and the live chat posted during it.</p>
+        <div class="by">Twitch · YouTube · webcam · <b>ffmpeg</b></div>
+      </div>
+      <div class="step card">
+        <div class="num">02</div>
+        <h3><span class="ic" style="background:#79c0ff22;color:var(--blue)">✦</span>Detect</h3>
+        <p>Gemini returns structured moments: product on camera, drinking, spoken mentions, brand screen time and safety flags.</p>
+        <div class="by"><b>Gemini Flash</b> · JSON schema</div>
+      </div>
+      <div class="step card">
+        <div class="num">03</div>
+        <h3><span class="ic" style="background:#f8514922;color:var(--red)">⊘</span>Decide</h3>
+        <p>The tip policy blocks sarcasm, competitors, replays, staged or unsafe moments and repeats. Every skip keeps its reason.</p>
+        <div class="by"><b>Tip policy</b> · cooldowns · caps</div>
+      </div>
+      <div class="step card">
+        <div class="num">04</div>
+        <h3><span class="ic" style="background:#a5a1ff22;color:var(--violet)">✓</span>Verify</h3>
+        <p>A stronger model re-checks each candidate like a sceptical auditor, and scores how chat reacted. Hype raises the tip.</p>
+        <div class="by"><b>Gemini Pro</b> · up to 1.5× for chat</div>
+      </div>
+      <div class="step card hi">
+        <div class="num">05</div>
+        <h3><span class="ic" style="background:var(--orange-soft);color:var(--orange)">$</span>Pay</h3>
+        <p>The tip is reserved against the campaign budget under a row lock, then sent as an idempotent Stripe transfer.</p>
+        <div class="by"><b>Supabase</b> ledger · <b>Stripe</b> Connect</div>
+      </div>
+      <div class="step card">
+        <div class="num">06</div>
+        <h3><span class="ic" style="background:#3fb95022;color:var(--green)">★</span>Show</h3>
+        <p>A "paid placement" thank-you alert lands on stream, so the brand gets a second moment in front of viewers.</p>
+        <div class="by"><b>Realtime</b> · Gemini TTS + card</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

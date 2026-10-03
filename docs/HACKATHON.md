@@ -2,11 +2,15 @@
 
 **Supabase Select Hackathon, October 3, 2026. Prompt: "build something agents want."**
 
+![Suparade: product placement for live streams, run by AI agents](images/01-cover.png)
+
 Suparade lets a brand's AI agent pay live streamers for product placement as it happens. It is both our team name and our product name.
 
 ## The idea in one paragraph
 
 In film, product placement is an established business: a laptop appears in a scene because the brand paid the producer. Live streaming on Twitch, YouTube and TikTok has no equivalent that works moment by moment and at small scale. Suparade is that equivalent. A brand such as Gatorade funds a campaign. An agent watches live streams, and when a streamer drinks a Gatorade or says something good about it, the agent sends that streamer a tip within moments, with a message that appears on screen.
+
+![Watch, detect, decide, verify, pay, show](images/02-how-it-works.png)
 
 ## Why it works for each side
 
@@ -15,6 +19,8 @@ In film, product placement is an established business: a laptop appears in a sce
 - **Viewers** see the tip and its message on the stream, a second brand moment on top of the placement.
 
 ## How it answers the prompt
+
+![Brand sightings and creator tips: what the agent gets](images/04-what-agents-get.png)
 
 The prompt asks for something an agent wants. We treated the agent as the customer and asked what a brand's marketing agent cannot do today. Two things:
 
@@ -32,6 +38,10 @@ The guidance for the event asked each team to name the agent, its task and the o
 The dashboard is the human side. A person starts a session, then watches every decision the agent makes, including the moments it refused to pay and why.
 
 ## How we used each technology
+
+![Supabase, Gemini, Stripe and Vercel](images/06-built-with.png)
+
+![Architecture: detector, payments API, Supabase and Stripe](images/03-architecture.png)
 
 ### Supabase
 
@@ -63,6 +73,8 @@ The dashboard is the human side. A person starts a session, then watches every d
 - Hosts the payments API as a Python function. The detector needs ffmpeg and long-running workers, so it runs beside it on a laptop or VM.
 
 ## Why you can trust this agent with money
+
+![The rules that stop a tip before money moves](images/05-guardrails.png)
 
 | Risk | What stops it |
 | --- | --- |

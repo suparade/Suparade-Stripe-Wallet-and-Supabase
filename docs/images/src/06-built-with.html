@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 72px; }
+  h2 { font-size: 60px; font-weight: 800; letter-spacing: -0.02em; margin-top: 14px; }
+  .grid { margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .tech { padding: 28px 32px; border-top-width: 4px; }
+  .tech h3 { font-size: 32px; font-weight: 800; display: flex; align-items: center; gap: 12px; }
+  .tech h3 .dot { width: 14px; height: 14px; }
+  .tech ul { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 9px; }
+  .tech li { font-size: 19px; color: var(--muted); padding-left: 22px; position: relative; line-height: 1.4; }
+  .tech li::before { content: "—"; position: absolute; left: 0; color: var(--dim); }
+  .tech li b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Built with</div>
+    <h2>Four platforms, one loop from pixels to payout.</h2>
+    <div class="grid">
+      <div class="tech card" style="border-top-color:#3ecf8e">
+        <h3><span class="dot" style="background:#3ecf8e"></span>Supabase</h3>
+        <ul>
+          <li><b>Postgres</b> as system of record, with an append-only wallet ledger</li>
+          <li><b>security definer</b> SQL functions hold every money rule</li>
+          <li><b>Row level security</b> and Auth scope brand data to its owner</li>
+          <li><b>Realtime</b> on tips, so the overlay reacts the moment one is paid</li>
+        </ul>
+      </div>
+      <div class="tech card" style="border-top-color:#4f8ff7">
+        <h3><span class="dot" style="background:#4f8ff7"></span>Gemini</h3>
+        <ul>
+          <li><b>Flash</b> analyses every clip's video and audio into a JSON schema</li>
+          <li><b>Pro</b> verifies candidates and scores the chat's reaction</li>
+          <li><b>Bounding boxes</b> on evidence thumbnails</li>
+          <li><b>Writes, speaks and illustrates</b> the thank-you alert</li>
+        </ul>
+      </div>
+      <div class="tech card" style="border-top-color:#635bff">
+        <h3><span class="dot" style="background:#635bff"></span>Stripe</h3>
+        <ul>
+          <li><b>Connect</b> transfers to creators, each with an idempotency key</li>
+          <li>The agent's <b>reason</b> written on every transfer</li>
+          <li><b>Checkout + webhook</b> to top up campaign budgets</li>
+        </ul>
+      </div>
+      <div class="tech card" style="border-top-color:#ffffff">
+        <h3><span class="dot" style="background:#ffffff"></span>Vercel</h3>
+        <ul>
+          <li>Hosts the <b>payments API</b> as a Python function</li>
+          <li>The agent's single endpoint for <b>log + pay</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

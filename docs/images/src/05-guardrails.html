@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 72px; display: grid; grid-template-columns: 620px 1fr; gap: 56px; }
+  h2 { font-size: 60px; font-weight: 800; letter-spacing: -0.02em; margin-top: 14px; line-height: 1.08; }
+  h2 em { font-style: normal; color: var(--orange); }
+  .lead { margin-top: 26px; font-size: 22px; line-height: 1.5; color: var(--muted); }
+  .stats { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .stat { padding: 20px 22px; }
+  .stat b { font-size: 40px; font-weight: 800; display: block; color: var(--text); }
+  .stat span { font-size: 16px; color: var(--muted); }
+  .rules { padding-top: 6px; display: flex; flex-direction: column; gap: 12px; }
+  .rule { display: grid; grid-template-columns: 1fr auto; align-items: center; padding: 17px 22px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+  .rule b { font-size: 20px; font-weight: 700; }
+  .rule small { display: block; font-size: 15px; color: var(--muted); margin-top: 3px; }
+  .tag { font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 700; padding: 5px 11px; border-radius: 8px; background: #f8514920; color: var(--red); }
+  .tag.ok { background: #3fb95020; color: var(--green); }
+  .rule.ok { border-color: #3fb95055; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Agent decisions</div>
+      <h2>An agent that knows when <em>not</em> to pay.</h2>
+      <p class="lead">Every rule runs before money moves. Skipped moments stay on the dashboard with their reasons, so a human can audit what the agent decided.</p>
+      <div class="stats">
+        <div class="stat card"><b>2</b><span>Gemini passes before a tip</span></div>
+        <div class="stat card"><b>30 s</b><span>cooldown per stream</span></div>
+        <div class="stat card"><b>≥ 0.6</b><span>confidence to be a candidate</span></div>
+        <div class="stat card"><b>1</b><span>tip per detection, idempotent</span></div>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="rule"><span><b>Competitor brand</b><small>Powerade, Prime, BodyArmor never get tipped</small></span><span class="tag">blocked</span></div>
+      <div class="rule"><span><b>Sarcastic or negative mention</b><small>Mentions need positive sentiment</small></span><span class="tag">blocked</span></div>
+      <div class="rule"><span><b>Staged or farming</b><small>Repeating the name just to get paid</small></span><span class="tag">blocked</span></div>
+      <div class="rule"><span><b>Replay, loop or animation</b><small>The footage must look live, with a real person</small></span><span class="tag">blocked</span></div>
+      <div class="rule"><span><b>Brand-safety flags</b><small>Alcohol, vaping, NSFW, slurs, gambling</small></span><span class="tag">blocked</span></div>
+      <div class="rule"><span><b>Over budget or over the cap</b><small>Enforced in Supabase SQL, not in the prompt</small></span><span class="tag">capped</span></div>
+      <div class="rule ok"><span><b>Real, positive, verified, with chat hype</b><small>Tip scaled by prominence and audience reaction, up to 1.5×</small></span><span class="tag ok">paid</span></div>
+    </div>
+  </div>
+</body>
+</html>

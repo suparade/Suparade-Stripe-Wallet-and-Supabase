@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 80px 72px; display: grid; grid-template-columns: 620px 1fr; gap: 56px; align-items: center; }
+  h1 { font-size: 100px; line-height: 1; margin: 22px 0 28px; }
+  .tag { font-size: 40px; line-height: 1.18; font-weight: 700; letter-spacing: -0.015em; }
+  .tag em { font-style: normal; color: var(--orange); }
+  .sub { margin-top: 24px; font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 590px; }
+  .chips { margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .stage { position: relative; height: 640px; }
+  .video { position: absolute; top: 20px; right: 0; width: 800px; border-radius: 20px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 30px 80px #000a; }
+  .video img { display: block; width: 100%; }
+  .feed { position: absolute; left: -64px; bottom: 0; width: 472px; padding: 20px; border-radius: 18px; background: #14141bf2; border: 1px solid var(--line); box-shadow: 0 30px 70px #000c; backdrop-filter: blur(8px); }
+  .feed h4 { font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; display: flex; justify-content: space-between; }
+  .feed h4 .live { color: var(--green); }
+  .row { display: grid; grid-template-columns: 26px 1fr auto; gap: 12px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); font-size: 17px; }
+  .row:first-of-type { border-top: 0; }
+  .row b { font-weight: 700; }
+  .row .who { color: var(--muted); font-size: 14px; display: block; margin-top: 2px; }
+  .ico { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: 14px; font-weight: 800; }
+  .pill { font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+  .ok { background: #3fb95022; color: var(--green); }
+  .paid { background: var(--orange-soft); color: var(--orange); }
+  .disc { position: absolute; right: 72px; bottom: 40px; font-size: 15px; color: var(--dim); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Supabase Select Hackathon</div>
+      <h1 class="logo"><span class="mark"></span>Suparade</h1>
+      <div class="tag">Product placement for live streams, <em>run by AI agents.</em></div>
+      <p class="sub">A brand's agent watches streams with Gemini, verifies the moment its product shows up, and tips the creator a real Stripe transfer from a budget held in Supabase.</p>
+      <div class="chips">
+        <span class="chip"><span class="dot" style="background:#4f8ff7"></span>Gemini</span>
+        <span class="chip"><span class="dot" style="background:#3ecf8e"></span>Supabase</span>
+        <span class="chip"><span class="dot" style="background:#635bff"></span>Stripe</span>
+        <span class="chip"><span class="dot" style="background:#ffffff"></span>Vercel</span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="video"><img src="demo-frame.jpg" alt=""></div>
+      <div class="feed">
+        <h4><span>Agent feed</span><span class="live">● live</span></h4>
+        <div class="row">
+          <span class="ico" style="background:#4f8ff722;color:#79c0ff">◉</span>
+          <span><b>Bottle on camera, drinking</b><span class="who">Scout · Gemini Flash · confidence 0.93</span></span>
+          <span class="pill ok">found</span>
+        </div>
+        <div class="row">
+          <span class="ico" style="background:#a5a1ff22;color:#a5a1ff">✓</span>
+          <span><b>Real, positive, not staged</b><span class="who">Verifier · Gemini Pro · chat reaction 1.4×</span></span>
+          <span class="pill ok">confirmed</span>
+        </div>
+        <div class="row">
+          <span class="ico" style="background:var(--orange-soft);color:var(--orange)">$</span>
+          <span><b>$5.00 to the creator</b><span class="who">Tipper · Stripe transfer · Supabase ledger</span></span>
+          <span class="pill paid">paid</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="disc">Demo stream is AI-generated. Example brand, not affiliated with Gatorade.</div>
+</body>
+</html>

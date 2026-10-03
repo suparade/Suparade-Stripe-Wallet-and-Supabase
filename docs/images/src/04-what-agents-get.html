@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 72px; }
+  h2 { font-size: 56px; font-weight: 800; letter-spacing: -0.02em; margin-top: 14px; max-width: 1300px; line-height: 1.1; }
+  h2 em { font-style: normal; color: var(--orange); }
+  .cols { margin-top: 44px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .col { padding: 30px 32px; }
+  .col h3 { font-size: 30px; font-weight: 800; }
+  .col .q { font-size: 20px; color: var(--muted); margin: 8px 0 20px; font-style: italic; }
+  pre { font-family: "JetBrains Mono", monospace; font-size: 16px; line-height: 1.6; background: #0d0d12; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; color: #c9d1d9; white-space: pre; }
+  .k { color: var(--blue); } .s { color: #a5d6ff; } .n { color: var(--orange); } .c { color: var(--dim); } .m { color: var(--violet); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Build something agents want</div>
+    <h2>A brand's marketing agent is the customer. Suparade gives it <em>eyes</em> and a <em>wallet</em>.</h2>
+    <div class="cols">
+      <div class="col card">
+        <h3>Brand sightings</h3>
+        <div class="q">"Where did my brand just appear, and what happened?"</div>
+<pre>{
+  <span class="k">"category"</span>: <span class="s">"holding_or_showing_beverage"</span>,
+  <span class="k">"brand"</span>: <span class="s">"Gatorade"</span>,
+  <span class="k">"quote"</span>: <span class="s">"clutch round, gotta hydrate"</span>,
+  <span class="k">"sentiment"</span>: <span class="s">"positive"</span>,
+  <span class="k">"confidence"</span>: <span class="n">0.93</span>,
+  <span class="k">"exposure_seconds"</span>: <span class="n">6.5</span>,
+  <span class="k">"boxes"</span>: [{ <span class="k">"label"</span>: <span class="s">"bottle"</span>, … }],
+  <span class="k">"audience_reaction"</span>: <span class="s">"hype"</span>,
+  <span class="k">"clip_url"</span>: <span class="s">"…/clip.mp4"</span>
+}</pre>
+      </div>
+      <div class="col card">
+        <h3>Creator tips</h3>
+        <div class="q">"Pay this creator this amount, with this message."</div>
+<pre><span class="m">POST</span> /agent/stream-events
+<span class="c">→ reserve budget under a row lock</span>
+<span class="c">→ cap at max_tip_cents</span>
+<span class="c">→ Stripe transfer, idempotent</span>
+
+{
+  <span class="k">"status"</span>: <span class="s">"paid"</span>,
+  <span class="k">"amount_cents"</span>: <span class="n">500</span>,
+  <span class="k">"capped"</span>: <span class="n">false</span>,
+  <span class="k">"stripe_transfer_id"</span>: <span class="s">"tr_…"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
