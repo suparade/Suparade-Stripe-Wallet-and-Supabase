@@ -68,6 +68,9 @@ uvicorn app.main:app --port 8001 > "$LOGS/payments.log" 2>&1 &
 wait_for http://localhost:8001/health || fail "payments API did not start, see backend/logs/payments.log"
 echo "ok"
 
+step "4b. Stripe transfer descriptions (adds the agent's reason to older tips)"
+python -m scripts.backfill_transfer_descriptions || echo "(could not update some older transfers, new ones are fine)"
+
 step "5. Campaign budget"
 balance() {
   curl -s -H "X-Agent-Key: $AGENT_API_KEY" "http://localhost:8001/agent/campaigns/$CAMPAIGN/context" |

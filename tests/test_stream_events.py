@@ -171,3 +171,29 @@ def test_streamer_by_uuid_and_webcam_video(env):
 def test_zero_amount_is_logged_not_paid(env):
     r = client.post("/agent/stream-events", headers=H, json=event(event_id="evt-5", suggested_tip_cents=0))
     assert r.json()["status"] == "skipped_zero_amount" and r.json()["tip"] is None
+
+
+def test_transfer_description_carries_the_reason(monkeypatch):
+    from app.services import tips as tips_service
+
+    sb = FakeSupabase()
+    sb.db["creators"] = [{"id": CREATOR, "display_name": "Demo Streamer", "handle": "demo-streamer",
+                          "stripe_account_id": "acct_x"}]
+    sb.db["detections"] = [{"id": "det-1", "category": "sports_drink_mention", "brand": "Gatorade",
+                            "description": "Streamer praises the drink.",
+                            "meta": {"verification_reason": "The streamer clearly praises the blue Gatorade."}}]
+    monkeypatch.setattr(tips_service, "get_supabase", lambda: sb)
+    tip = {"id": "tip-1", "detection_id": "det-1", "creator_id": CREATOR, "campaign_id": CAMPAIGN,
+           "message": "Gatorade just tipped $4.50!", "reasoning": "Gemini flagged it.", "show_at_seconds": 12.5}
+    d = tips_service.transfer_details(tip)
+    assert d["destination"] == "acct_x"
+    assert d["description"] == ("Gatorade tip to demo-streamer for sports drink mention: "
+                                "The streamer clearly praises the blue Gatorade.")
+    assert d["metadata"]["on_screen_message"] == "Gatorade just tipped $4.50!"
+    assert d["metadata"]["agent_reasoning"] == "Gemini flagged it."
+    assert all(isinstance(v, str) and len(v) <= 500 for v in d["metadata"].values())
+
+    # A plain tipper agent tip (no Gemini meta) uses the agent's own reasoning.
+    sb.db["detections"][0].update(meta={}, category=None, brand=None)
+    tip["reasoning"] = "Clear on camera use, worth the max."
+    assert tips_service.transfer_details(tip)["description"] == "Tip to demo-streamer: Clear on camera use, worth the max."
