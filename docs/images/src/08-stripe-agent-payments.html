@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 60px 72px; }
+  .eyebrow { color: var(--stripe); }
+  h2 { font-size: 54px; font-weight: 800; letter-spacing: -0.02em; margin-top: 12px; }
+  h2 em { font-style: normal; color: var(--stripe); }
+
+  .flow { margin-top: 44px; display: grid; grid-template-columns: 1fr 26px 1fr 26px 1fr 26px 1fr 26px 1fr; align-items: stretch; gap: 6px; }
+  .st { padding: 22px 18px 24px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--c); }
+  .st .n { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c); }
+  .st b { display: block; font-size: 20px; font-weight: 800; margin: 6px 0 8px; line-height: 1.2; }
+  .st p { font-size: 15px; line-height: 1.45; color: var(--muted); }
+  .st code { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--text); }
+  .st .by { margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--c); }
+  .ar { align-self: center; text-align: center; color: var(--stripe); font-size: 22px; font-weight: 800; }
+  .st.pay { background: linear-gradient(180deg, #7a73ff1c, var(--panel)); border-color: #7a73ff66; border-top-color: var(--stripe); }
+
+  .bottom { margin-top: 30px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; }
+  .panel { padding: 26px 28px; }
+  .panel h4 { font-size: 14px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
+  pre { font-family: "JetBrains Mono", monospace; font-size: 16px; line-height: 1.75; color: #c9d1d9; white-space: pre; }
+  .k { color: #ff7b72; } .f { color: #d2a8ff; } .s { color: #a5d6ff; } .c { color: var(--dim); } .p { color: #79c0ff; }
+  .rules { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .rules li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; font-size: 17.5px; line-height: 1.4; color: var(--muted); }
+  .rules li i { font-style: normal; width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; font-size: 13px; font-weight: 800; background: #7a73ff22; color: var(--stripe); margin-top: 1px; }
+  .rules li b { color: var(--text); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Stripe · agent payments</div>
+    <h2>The agent pays creators itself, <em>inside hard limits.</em></h2>
+
+    <div class="flow">
+      <div class="st" style="--c: var(--supabase)">
+        <div class="n">1 · Fund</div>
+        <b>Brand funds the budget</b>
+        <p>Stripe Checkout, then a signed webhook credits the campaign ledger once.</p>
+        <div class="by">Stripe Checkout → Supabase</div>
+      </div>
+      <div class="ar">→</div>
+      <div class="st" style="--c: var(--gemini)">
+        <div class="n">2 · Decide</div>
+        <b>Agent prices the moment</b>
+        <p>From what the creator did, how prominent the product was, and how chat reacted.</p>
+        <div class="by">Gemini scout + verifier</div>
+      </div>
+      <div class="ar">→</div>
+      <div class="st" style="--c: var(--supabase)">
+        <div class="n">3 · Reserve</div>
+        <b>Budget reserved</b>
+        <p><code>reserve_tip</code> checks the budget and the per-tip cap under a row lock.</p>
+        <div class="by">Supabase Postgres</div>
+      </div>
+      <div class="ar">→</div>
+      <div class="st pay" style="--c: var(--stripe)">
+        <div class="n">4 · Pay</div>
+        <b>Stripe Connect transfer</b>
+        <p>Straight to the creator's connected account, no human in the loop.</p>
+        <div class="by">Stripe Connect</div>
+      </div>
+      <div class="ar">→</div>
+      <div class="st" style="--c: var(--orange)">
+        <div class="n">5 · Show</div>
+        <b>Shown on stream</b>
+        <p>Transfer id on the dashboard, "paid placement" alert on the stream.</p>
+        <div class="by">Dashboard + overlay</div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="panel card">
+        <h4>The transfer the agent sends · app/services/tips.py</h4>
+<pre>transfer = stripe.<span class="f">Transfer</span>.<span class="f">create</span>(
+    <span class="p">amount</span>=tip[<span class="s">"amount_cents"</span>],
+    <span class="p">currency</span>=tip[<span class="s">"currency"</span>],
+    <span class="p">destination</span>=creator[<span class="s">"stripe_account_id"</span>],
+    <span class="p">description</span>=details[<span class="s">"description"</span>],   <span class="c"># the agent's reason</span>
+    <span class="p">transfer_group</span>=<span class="k">f</span><span class="s">"campaign_{tip['campaign_id']}"</span>,
+    <span class="p">metadata</span>=details[<span class="s">"metadata"</span>],         <span class="c"># tip, moment, brand, reason</span>
+    <span class="p">idempotency_key</span>=<span class="k">f</span><span class="s">"tip-{tip['id']}"</span>,     <span class="c"># never pays twice</span>
+)</pre>
+      </div>
+      <div class="panel card">
+        <h4>Guardrails</h4>
+        <ul class="rules">
+          <li><i>1</i><span><b>One tip per detection,</b> enforced by a unique key in Postgres</span></li>
+          <li><i>2</i><span><b>Idempotency key per tip:</b> a retry never pays twice</span></li>
+          <li><i>3</i><span><b>Stripe says no?</b> <code style="font-family:'JetBrains Mono',monospace;font-size:14px">fail_tip</code> refunds the budget</span></li>
+          <li><i>4</i><span><b>Network error?</b> The tip stays pending for a safe retry</span></li>
+          <li><i>5</i><span><b>Test mode only:</b> live keys refused unless explicitly allowed</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

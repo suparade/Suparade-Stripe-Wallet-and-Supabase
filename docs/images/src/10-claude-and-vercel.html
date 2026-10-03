@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root { --w: 1600px; --h: 900px; }
+  .wrap { position: absolute; inset: 0; padding: 60px 72px; }
+  h2 { font-size: 54px; font-weight: 800; letter-spacing: -0.02em; margin-top: 12px; }
+  h2 .cl { color: var(--claude); }
+  .cols { margin-top: 36px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; }
+  .panel { padding: 26px 28px; border-top: 4px solid var(--c); height: 640px; display: flex; flex-direction: column; }
+  .role { font-size: 13px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c); }
+  .panel h3 { font-size: 34px; font-weight: 800; margin: 4px 0 10px; }
+  .panel p { font-size: 18px; line-height: 1.45; color: var(--muted); }
+  .panel p b { color: var(--text); font-weight: 600; }
+
+  .term { margin-top: 18px; border-radius: 12px; background: #0d0d12; border: 1px solid var(--line); padding: 16px 18px; font-family: "JetBrains Mono", monospace; font-size: 13.5px; line-height: 1.5; }
+  .term .cmd { color: var(--dim); margin-bottom: 10px; }
+  .term .cmd span { color: var(--text); }
+  .commit { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 7px 0; border-top: 1px solid #1f1f29; color: #c9d1d9; }
+  .commit:first-of-type { border-top: 0; }
+  .commit em { font-style: normal; color: var(--claude); white-space: nowrap; }
+  .stats { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .stat { padding: 14px 16px; border-radius: 12px; background: var(--panel-2); border: 1px solid #343444; }
+  .stat b { display: block; font-size: 26px; font-weight: 800; }
+  .stat span { font-size: 14px; color: var(--muted); }
+
+  .code { margin-top: 18px; border-radius: 12px; background: #0d0d12; border: 1px solid var(--line); padding: 16px 18px; font-family: "JetBrains Mono", monospace; font-size: 13.5px; line-height: 1.6; color: #c9d1d9; white-space: pre; }
+  .code .c { color: var(--dim); } .code .s { color: #a5d6ff; } .code .k { color: #ff7b72; }
+  .eps { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .ep { display: grid; grid-template-columns: 54px 1fr; align-items: center; gap: 10px; font-size: 15px; }
+  .ep i { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700; text-align: center; padding: 3px 0; border-radius: 6px; background: #ffffff14; color: var(--text); }
+  .ep code { font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--text); }
+  .ep span { color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">Development and hosting</div>
+    <h2>Coded with <span class="cl">Claude</span>, hosted on Vercel.</h2>
+    <div class="cols">
+      <div class="panel card" style="--c: var(--claude)">
+        <div class="role">Code development</div>
+        <h3>Claude Code</h3>
+        <p><b>Every commit in the repo is co-authored by Claude:</b> the Supabase schema, the payments API, Stripe payouts, the detector merge, the docs and these images.</p>
+        <div class="term">
+          <div class="cmd">$ <span>git log --reverse</span>  # message · Co-Authored-By</div>
+          <div class="commit"><span>Suparade backend: Supabase schema, FastAPI, Stripe Connect payouts</span><em>Claude Sonnet 5.5</em></div>
+          <div class="commit"><span>Merge the Gemini livestream detector with Stripe payouts</span><em>Claude Opus 5.5</em></div>
+          <div class="commit"><span>Add one command end to end run script</span><em>Claude Opus 5.5</em></div>
+          <div class="commit"><span>Put the agent's reason on every Stripe transfer</span><em>Claude Opus 5.5</em></div>
+          <div class="commit"><span>Add submission documentation: README overview and docs/ guides</span><em>Claude Fable 5.1</em></div>
+          <div class="commit"><span>Add submission images and embed them in the README and write-up</span><em>Claude Opus 5.5</em></div>
+          <div class="commit"><span>Show what each hackathon tool does in the submission images</span><em>Claude Opus 5.5</em></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>100%</b><span>of commits co-authored</span></div>
+          <div class="stat"><b>3</b><span>Claude models used</span></div>
+          <div class="stat"><b>34</b><span>tests, all passing</span></div>
+        </div>
+      </div>
+
+      <div class="panel card" style="--c: var(--vercel)">
+        <div class="role">Hosting</div>
+        <h3>Vercel</h3>
+        <p>The <b>payments API</b> runs on Vercel as a Python function. It is the one place agents call to log a moment and pay for it.</p>
+<div class="code"><span class="c"># api/index.py</span>
+<span class="k">from</span> app.main <span class="k">import</span> app
+
+<span class="c"># vercel.json</span>
+{ <span class="s">"rewrites"</span>: [{ <span class="s">"source"</span>: <span class="s">"/(.*)"</span>,
+                 <span class="s">"destination"</span>: <span class="s">"/api/index"</span> }] }</div>
+        <div class="eps">
+          <div class="ep"><i>POST</i><div><code>/agent/stream-events</code> <span>· log a moment, pay it</span></div></div>
+          <div class="ep"><i>POST</i><div><code>/agent/tips</code> <span>· pay a detection</span></div></div>
+          <div class="ep"><i>POST</i><div><code>/campaigns/{id}/fund</code> <span>· Stripe Checkout</span></div></div>
+          <div class="ep"><i>POST</i><div><code>/webhooks/stripe</code> <span>· credit the budget</span></div></div>
+          <div class="ep"><i>POST</i><div><code>/creators/{id}/connect</code> <span>· Stripe onboarding</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
