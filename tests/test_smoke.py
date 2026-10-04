@@ -1,13 +1,6 @@
-import os
+from fastapi.testclient import TestClient
 
-os.environ.setdefault("SUPABASE_URL", "http://localhost:54321")
-os.environ.setdefault("SUPABASE_SERVICE_ROLE_KEY", "test")
-os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_dummy")
-os.environ.setdefault("AGENT_API_KEY", "secret")
-
-from fastapi.testclient import TestClient  # noqa: E402
-
-from app.main import app  # noqa: E402
+from app.main import app
 
 client = TestClient(app)
 
@@ -42,8 +35,8 @@ def test_tip_validation_rejects_bad_amounts():
     assert r.status_code == 422
 
 
-def test_webhook_rejects_unsigned_payload():
-    os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_test"
+def test_webhook_rejects_unsigned_payload(monkeypatch):
+    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
     from app.config import get_settings
 
     get_settings.cache_clear()

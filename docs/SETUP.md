@@ -196,6 +196,7 @@ Each clip with enough sponsor screen time also pays a small bonus, so keep the c
 | `PAYMENTS_MAX_ATTEMPTS` | `3` | Retries on network errors and 5xx |
 | `EVENT_WEBHOOK_URL` | | Optional extra webhook for every paid tip |
 | `CORS_ORIGINS` | `http://localhost:5173` | Allowed dashboard origins |
+| `DETECTOR_KEY` | Empty: every endpoint open | Key required in `X-Detector-Key` to start, feed or stop sessions. The Compute deploy generates one |
 
 Tip amounts per category and the reaction multipliers are constants in `backend/config.py`. See [AGENT_DECISIONS.md](AGENT_DECISIONS.md).
 
@@ -209,7 +210,11 @@ pytest
 python -m unittest discover -s backend/tests -t .
 ```
 
-`pytest` runs the payments API tests in `tests/` and the detector tests in `backend/tests/`: 34 in total. The second command runs the detector's 22 on their own. Both use fakes for Supabase, Stripe and Gemini, so they need no keys.
+```bash
+node --test supabase/compute/overlay/overlay.test.mjs frontend/detectorProxy.test.js
+```
+
+`pytest` runs the payments API and MCP server tests in `tests/` and the detector tests in `backend/tests/`: 55 in total. The second command runs the detector's 25 on their own, and the third the overlay's 9 and the dashboard proxy's 4. They use fakes for Supabase, Stripe and Gemini, so they need no keys.
 
 | File | Covers |
 | --- | --- |
@@ -218,6 +223,10 @@ python -m unittest discover -s backend/tests -t .
 | `backend/tests/test_tip_policy.py` | Every block rule, cooldown and repetition |
 | `backend/tests/test_payments.py` | The payments client: retries on server errors and pending transfers, refusals not retried, simulated mode |
 | `backend/tests/test_pay_flow.py` | The session's pay step: a paid tip, a failed payment releasing its slot, capping before paying |
+| `backend/tests/test_detector_key.py` | `X-Detector-Key` on the session endpoints, and local files limited to `backend/demo/` |
+| `tests/test_compute_mcp.py` | The MCP server's helpers: key handling, input checks, and how campaigns, sightings and tips are shaped |
+| `supabase/compute/overlay/overlay.test.mjs` | The overlay: which Realtime changes become alerts, amounts, config and page rendering |
+| `frontend/detectorProxy.test.js` | The dashboard's proxy to the Compute detector: target paths, `wss`, and where the detector key comes from and goes |
 
 To test Gemini alone on a clip:
 
@@ -234,7 +243,67 @@ python -m backend.gemini_analyzer path/to/clip.mp4
 3. Deploy, then set the detector's `SUPARADE_API_URL` to the Vercel URL.
 4. For funding, add a Stripe webhook endpoint at `<vercel url>/webhooks/stripe` for `checkout.session.completed` and put its signing secret in `STRIPE_WEBHOOK_SECRET`.
 
-The detector stays on a laptop or VM: it needs ffmpeg and long-running workers.
+The detector does not go to Vercel: it needs ffmpeg and long-running workers. It runs on Supabase Compute, below.
+
+## Deploying the detector to Supabase Compute
+
+The detector runs as a Supabase Compute service in the `hackathon-2026` project: https://pvoesovsparqqzosgwki.supabase.co/compute/v1/detector. Compute is in private alpha, so the project needs access, and the CLI needs version 2.119 or later.
+
+`[compute.detector]` in `supabase/config.toml` holds the setup: built from `backend/Dockerfile` with `backend/` as the build context, 4 GB and 2 vCPU, a public URL, and one instance, because sessions live in memory. Don't run `supabase config push` against that file: it only sets up Compute, so every other setting would be pushed as its default. Deploy services by name. A bare `supabase compute push` deploys every service in the file, and the detector's build needs the `backend/.env.compute` that the script writes.
+
+1. Log the CLI in with `supabase login`.
+2. Set `SUPARADE_API_URL` to the payments API's `https://` URL. The container cannot reach localhost, so without an `https://` URL the deployed detector simulates tips.
+3. Run `./scripts/deploy_detector.sh`.
+
+The script writes `backend/.env.compute` (gitignored) with only the detector's values: the Gemini key, the campaign id, the agent key, `CORS_ORIGINS` and `SUPARADE_API_URL`. That file is shipped in the build and becomes the container's `backend/.env`, because our access token cannot set project secrets. The script also generates `DETECTOR_KEY` on the first run and keeps it in that file. It then runs `supabase compute deploy detector`.
+
+Check the deploy:
+
+```bash
+curl https://pvoesovsparqqzosgwki.supabase.co/compute/v1/detector/api/health
+```
+
+```bash
+SUPABASE_EXPERIMENTAL_COMPUTE=1 supabase compute status detector --project-ref pvoesovsparqqzosgwki
+```
+
+```bash
+SUPABASE_EXPERIMENTAL_COMPUTE=1 supabase compute logs detector --project-ref pvoesovsparqqzosgwki
+```
+
+Calls that start, feed or stop a session need the `X-Detector-Key` header with the value from `backend/.env.compute`. Local video files must be in `backend/demo/`. Any other path is refused, because `/api/sessions/{id}/media` serves a session's file.
+
+### The dashboard against the detector on Compute
+
+```bash
+cd frontend && npm run dev:compute
+```
+
+This opens the dashboard at http://localhost:5174. `vite.compute.config.js` proxies `/api`, `/evidence` and `/ws` to `https://pvoesovsparqqzosgwki.supabase.co/compute/v1/detector`; set `DETECTOR_URL` to use another one. The local dashboard on port 5173, which `run_e2e.sh` uses, is unchanged.
+
+Watching works without a key. To start, feed or stop a stream, the dev server adds `X-Detector-Key` to `/api` requests, so the key never reaches the browser. It takes the key from `DETECTOR_KEY` in the environment, or from `backend/.env.compute`. That file only exists on the machine that last ran `scripts/deploy_detector.sh`. Without it, those buttons get a 401 and the dev server says so when it starts.
+
+## Deploying the MCP server and the overlay to Supabase Compute
+
+Both are declared in `supabase/config.toml` and need no secrets: Compute passes each service the project URL, a service key and a browser-safe key, the same defaults Edge Functions get. Deploy them by name:
+
+```bash
+npx -y supabase@latest compute deploy mcp overlay --project-ref pvoesovsparqqzosgwki
+```
+
+Check them. Each `/health` reports whether the keys arrived, never their values:
+
+```bash
+curl https://pvoesovsparqqzosgwki.supabase.co/compute/v1/mcp/health
+```
+
+```bash
+curl https://pvoesovsparqqzosgwki.supabase.co/compute/v1/overlay/health
+```
+
+The MCP endpoint is `https://pvoesovsparqqzosgwki.supabase.co/compute/v1/mcp/mcp`. Every request needs `X-Agent-Key`, which the server checks with the payments API, so the service stores no key. `watch_stream` and `stop_watching` also need `X-Detector-Key`, which is passed through to the detector. Its tools are `list_campaigns`, `brand_sightings`, `tips`, `scout_status`, `watch_stream` and `stop_watching`.
+
+The overlay is `https://pvoesovsparqqzosgwki.supabase.co/compute/v1/overlay?campaign=<campaign id>`. Add it to OBS as a browser source. `&brand=` changes the sponsor name, `&test` shows a sample alert and `&debug` shows the Realtime connection.
 
 ## Stripe webhook, locally
 
@@ -276,5 +345,8 @@ Notes:
 | Clips are reported `skipped` | Analysis is slower than the stream | Expected under load; raise `MAX_BACKLOG` or `CHUNK_SECONDS` |
 | No speech is analysed for a screen share | Tab audio was not shared | Tick "share tab audio" when sharing |
 | The detector cannot open a stream | ffmpeg or streamlink is missing, or the channel is offline | Install ffmpeg; check the URL is live |
+| `invalid_detector_key` | The detector has a `DETECTOR_KEY` and the call did not send it | Send `X-Detector-Key`; the deployed value is in `backend/.env.compute` |
+| `local files must be in backend/demo/` | A session was started with a file outside `backend/demo/` | Move the video into `backend/demo/` |
+| The Compute deploy or `supabase projects list` says Unauthorized | An old `SUPABASE_ACCESS_TOKEN` in the shell overrides `supabase login`. `supabase login` then saves that old token again instead of opening the browser | `unset SUPABASE_ACCESS_TOKEN`, run `supabase login`, and replace the token wherever your shell sets it |
 
 Restarting the detector stops the streams it was watching, because sessions are held in memory. Paid tips are safe in Supabase.

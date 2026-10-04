@@ -1,19 +1,13 @@
 """POST /agent/stream-events with an in-memory Supabase and a fake Stripe settle step."""
-import os
 import re
 import uuid
 
-os.environ.setdefault("SUPABASE_URL", "http://localhost:54321")
-os.environ.setdefault("SUPABASE_SERVICE_ROLE_KEY", "test")
-os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_dummy")
-os.environ.setdefault("AGENT_API_KEY", "secret")
+import pytest
+from fastapi.testclient import TestClient
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-
-from app.main import app  # noqa: E402
-from app.services import stream_events  # noqa: E402
-from app.services.tips import TipError  # noqa: E402
+from app.main import app
+from app.services import stream_events
+from app.services.tips import TipError
 
 
 class _Res:

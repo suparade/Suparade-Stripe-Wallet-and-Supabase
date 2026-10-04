@@ -32,8 +32,17 @@ cd frontend && npm install && npm run dev            # http://localhost:5173
 
 In the dashboard, either paste a Twitch / YouTube live URL, or click **Webcam**
 or **Screen-share a tab** (tick "share tab audio" so speech is analyzed). A
-local file path also works in the URL box and is replayed in real time, which
-is handy for demos.
+video in `backend/demo/` also works in the URL box and is replayed in real
+time, which is handy for demos. Other local paths are refused, because
+`/api/sessions/{id}/media` serves the session's file.
+
+## Deploy (Supabase Compute)
+
+The detector runs on Supabase Compute, built from `backend/Dockerfile` as
+`[compute.detector]` in `supabase/config.toml`. Deploy with
+`./scripts/deploy_detector.sh`. It writes `backend/.env.compute` with the
+detector's own values and a generated `DETECTOR_KEY`. See
+[docs/SETUP.md](../docs/SETUP.md#deploying-the-detector-to-supabase-compute).
 
 Test the model alone on a clip:
 
@@ -98,11 +107,14 @@ are not sent to the webhook.
 | GET | `/api/payments` | campaign budget left and payout status (from the payments API) |
 | WS | `/ws/events` | live `event` / `chunk` / `session` messages |
 
+With `DETECTOR_KEY` set (the Compute deploy sets it), the POST and DELETE
+session routes need the `X-Detector-Key` header.
+
 ## Config (`backend/.env`)
 
 `GEMINI_MODEL` (default `gemini-flash-latest`), `CHUNK_SECONDS` (10),
 `CONFIDENCE_THRESHOLD` (0.6), `COOLDOWN_SECONDS` (30), `SUPARADE_API_URL`,
-`SUPARADE_CAMPAIGN_ID`, `SUPARADE_AGENT_KEY`, `EVENT_WEBHOOK_URL`.
+`SUPARADE_CAMPAIGN_ID`, `SUPARADE_AGENT_KEY`, `EVENT_WEBHOOK_URL`, `DETECTOR_KEY`.
 Tip amounts per category are in `backend/config.py`.
 
 Never commit `backend/.env`. The hackathon account revokes leaked keys.

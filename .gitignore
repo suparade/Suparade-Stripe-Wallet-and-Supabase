@@ -1,4 +1,4 @@
-# Secrets (both the payments API .env and backend/.env)
+# Secrets (the payments API .env, backend/.env and the Compute deploy's backend/.env.compute)
 .env
 .env.*
 *.env.local
@@ -12,6 +12,9 @@ __pycache__/
 
 # Vercel
 .vercel/
+
+# Supabase CLI state
+supabase/.temp/
 
 # Gemini detector runtime output
 backend/.chunks/

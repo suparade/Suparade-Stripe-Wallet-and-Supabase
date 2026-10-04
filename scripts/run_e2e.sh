@@ -3,7 +3,7 @@
 # a $0.50 Stripe test tip, then the demo stream with real Gemini analysis and real Stripe payouts.
 #
 #   ./scripts/run_e2e.sh                 Ctrl+C stops everything
-#   ./scripts/run_e2e.sh <video or URL>  analyze something else (file path, Twitch or YouTube live URL)
+#   ./scripts/run_e2e.sh <video or URL>  analyze something else (a video in backend/demo/, Twitch or YouTube live URL)
 #
 # Needs: .env (payments), backend/.env with GEMINI_API_KEY and SUPARADE_CAMPAIGN_ID, Node, ffmpeg
 # (installed with Homebrew if missing). Logs go to backend/logs/.

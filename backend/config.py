@@ -41,6 +41,9 @@ TIP_CENTS_BY_CATEGORY = {
 }
 
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+# Shared key (X-Detector-Key) for the endpoints that start, feed or stop sessions. Empty = open, for local dev.
+# The Supabase Compute deploy sets it (scripts/deploy_detector.sh).
+DETECTOR_KEY = os.getenv("DETECTOR_KEY", "")
 
 
 def _csv(name: str, default: str) -> list[str]:

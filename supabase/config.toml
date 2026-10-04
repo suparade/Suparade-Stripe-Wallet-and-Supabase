@@ -1,0 +1,33 @@
+# Supabase Compute (private alpha): services that run next to this project's Postgres.
+# Deploy one by name:  supabase compute deploy <name> --project-ref <ref>
+# Each public service is served at https://<ref>.supabase.co/compute/v1/<name>.
+# This file only sets up Compute: don't run `supabase config push` against it.
+[experimental]
+compute = true
+
+# The Gemini detector: ffmpeg, streamlink and long-running stream workers. Built from
+# backend/Dockerfile with backend/ as the context. One instance, because sessions live in memory.
+# Deploy with scripts/deploy_detector.sh, which writes backend/.env.compute (shipped, never .env).
+[compute.detector]
+runtime = "dockerfile"
+size = "4gb"
+exposure = "public"
+instances = 1
+source = "backend"
+exclude = [".env", ".git", ".venv", "__pycache__", "*.pyc", "evidence", "logs", "events.jsonl", ".chunks", "tests"]
+
+# MCP server for agents: brand sightings, tips and campaign budgets, and a tool to send the scout
+# to a stream. Endpoint: /compute/v1/mcp/mcp, with the agent key in the X-Agent-Key header.
+[compute.mcp]
+runtime = "dockerfile"
+size = "2gb"
+exposure = "public"
+exclude = [".env", ".env.*", ".git", "__pycache__", "*.pyc"]
+
+# Stream overlay: the page a streamer adds to OBS as a browser source. It shows each paid tip the
+# moment Supabase Realtime pushes it. Page: /compute/v1/overlay
+[compute.overlay]
+runtime = "node"
+size = "2gb"
+exposure = "public"
+exclude = [".env", ".env.*", ".git", "node_modules", "*.log", "*.test.mjs"]
